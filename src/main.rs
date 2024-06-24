@@ -1,6 +1,7 @@
 use gamestate::{show_game_over, GameState};
 use macroquad::prelude::*;
 mod fuel;
+mod gameaudio;
 mod gamestate;
 mod gamestate_test;
 mod lunarmodule;
@@ -15,6 +16,7 @@ const MINIMUM_TIME_FRAME: f32 = 1. / 15.; // 15 frames per second
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let mut game_audio = gameaudio::GameAudio::new();
     let mut coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
     // println!("{:?}", coordinates);
     let mut lunar_module = lunarmodule::create_initial_lunar_module();
@@ -38,7 +40,7 @@ async fn main() {
         clear_background(BLACK);
         draw_text("LUNAR LANDER", 20.0, 20.0, 30.0, DARKGRAY);
 
-        movement::move_lunar_module(&mut lunar_module);
+        movement::move_lunar_module(&mut lunar_module, &mut game_audio);
         map::draw(&coordinates);
         lunarmodule::draw(lunar_module).await;
         fuel::draw(lunar_module.fuel);

@@ -8,10 +8,14 @@ const TRUST_CHANGE_PER_FRAME: f32 = 0.25;
 const RORATION_CHANGE_PER_FRAME: f32 = 5.0;
 const FUEL_CHANGE_PER_FRAME: f32 = 0.7;
 
-pub fn move_lunar_module(lunar_module: &mut lunarmodule::LunarModule) {
+pub fn move_lunar_module(
+    lunar_module: &mut lunarmodule::LunarModule,
+    game_audio: &mut crate::gameaudio::GameAudio,
+) {
     lunar_module.trust_active = false;
 
     if is_key_down(KeyCode::Up) && lunar_module.fuel > 0.0 {
+        game_audio.exhaust();
         lunar_module.trust += TRUST_CHANGE_PER_FRAME;
         lunar_module.trust_active = true;
         lunar_module.fuel -= FUEL_CHANGE_PER_FRAME;
