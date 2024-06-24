@@ -2,7 +2,11 @@
 mod tests {
     use macroquad::math::Vec2;
 
-    use crate::{gamestate, lunarmodule, map::SurfaceCoordinate};
+    use crate::{
+        gamestate::{self, IMAGE_CORRECTION_Y},
+        lunarmodule,
+        map::SurfaceCoordinate,
+    };
 
     fn get_surface_coordinates() -> Vec<crate::map::SurfaceCoordinate> {
         vec![
@@ -32,7 +36,10 @@ mod tests {
         let surface_coordinates = get_surface_coordinates();
         let lunar_module = lunarmodule::LunarModule {
             rotation: 3.0,
-            position: Vec2 { x: 101.0, y: 90.0 },
+            position: Vec2 {
+                x: 101.0,
+                y: 50.0 - IMAGE_CORRECTION_Y,
+            },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
@@ -49,7 +56,7 @@ mod tests {
         let surface_coordinates = get_surface_coordinates();
         let lunar_module = lunarmodule::LunarModule {
             rotation: 3.0,
-            position: Vec2 { x: 101.0, y: 70.0 },
+            position: Vec2 { x: 101.0, y: 10.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,

@@ -1,8 +1,3 @@
-use std::{
-    f32::consts::{E, PI},
-    iter::Fuse,
-};
-
 use macroquad::prelude::*;
 
 pub fn draw(fuel: f32) {

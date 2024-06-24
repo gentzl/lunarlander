@@ -1,4 +1,4 @@
-use std::f32::consts::{E, PI};
+use std::f32::consts::PI;
 
 use macroquad::prelude::*;
 
@@ -10,6 +10,9 @@ pub struct LunarModule {
     pub trust_active: bool,
     pub fuel: f32,
 }
+
+pub const ROCKET_IMAGE_SIZE: f32 = 45.0;
+
 const SHIP_STARTING_ROTATION: f32 = 0.0;
 const SHIP_STARTING_TRUST: f32 = 0.0;
 const SHIP_STARTING_X: f32 = 150.;
@@ -22,11 +25,13 @@ pub async fn draw(lunarmodule: LunarModule) {
         "src/rocket32_no_trust.png"
     };
 
+    let corrected_x = lunarmodule.position.x - ROCKET_IMAGE_SIZE / 2.0;
+    let corrected_y = lunarmodule.position.y - ROCKET_IMAGE_SIZE / 2.0;
     let texture: Texture2D = load_texture(path).await.unwrap();
     draw_texture_ex(
         &texture,
-        lunarmodule.position.x,
-        lunarmodule.position.y,
+        corrected_x,
+        corrected_y,
         WHITE,
         DrawTextureParams {
             rotation: lunarmodule.rotation * PI / 180.0,

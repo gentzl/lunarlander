@@ -1,21 +1,13 @@
-use cgmath::{prelude::*, Vector3};
-// Assuming the file name for the unit test is movement_test.rs
-// Include the necessary modules and the module under test
+use cgmath::prelude::*;
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
 
     use cgmath::Basis3;
     use cgmath::Deg;
-    use cgmath::Rotation2;
     use cgmath::Rotation3;
-    use cgmath::Vector2;
     use cgmath::Vector3;
 
     use super::*;
-    //   use crate::lunarmodule::LunarModule;
-
-    // Test moving the lunar module upwards increases trust
     #[test]
     fn test_move_lunar_module_up_increases_trust() {
         let v1 = Vector3::new(1.0, 1.0, 0.0);
