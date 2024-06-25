@@ -10,4 +10,5 @@ pub fn draw(fuel: f32) {
         _ => GREEN,
     };
     draw_rectangle(screen_width() / 2.0 - 100.0, 5.0, fuel * 3.0, 10.0, color);
+    draw_text("FUEL", screen_width() / 2.0 - 100.0, 14.0, 17.0, DARKGRAY);
 }

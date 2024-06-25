@@ -1,8 +1,4 @@
-use crate::{
-    lunarmodule::{self},
-    map::SurfaceCoordinate,
-    MAX_WINDOW_HEIGHT, MAX_WINDOW_WIDTH,
-};
+use crate::{gameaudio, lunarmodule, map::SurfaceCoordinate, MAX_WINDOW_HEIGHT, MAX_WINDOW_WIDTH};
 pub const IMAGE_CORRECTION_Y: f32 = 10.0;
 
 use macroquad::prelude::*;
@@ -92,7 +88,7 @@ fn check_crashed(
     GameState::NotLanded
 }
 
-pub fn show_game_over(gamestate: &GameState) {
+pub fn show_game_over(gamestate: &GameState, game_audio: &mut gameaudio::GameAudio) {
     match gamestate {
         GameState::Landed => {
             draw_text(
@@ -102,6 +98,7 @@ pub fn show_game_over(gamestate: &GameState) {
                 50.0,
                 GREEN,
             );
+            game_audio.won();
         }
         GameState::Crashed => {
             draw_text(
@@ -111,6 +108,7 @@ pub fn show_game_over(gamestate: &GameState) {
                 50.0,
                 RED,
             );
+            game_audio.lost();
         }
         _ => {}
     }

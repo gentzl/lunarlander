@@ -24,11 +24,12 @@ async fn main() {
 
     loop {
         if gamestate != GameState::NotLanded {
-            show_game_over(&gamestate);
+            show_game_over(&gamestate, &mut game_audio);
 
             if is_key_down(KeyCode::Enter) {
                 // restart
                 gamestate = GameState::NotLanded;
+                game_audio.reset();
                 coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
                 lunar_module = lunarmodule::create_initial_lunar_module();
             }
