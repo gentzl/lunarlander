@@ -6,6 +6,7 @@ use macroquad::prelude::*;
 pub struct LunarModule {
     pub rotation: f32,
     pub position: Vec2,
+    pub current_relative_position: Vec2,
     pub trust: f32,
     pub trust_active: bool,
     pub fuel: f32,
@@ -20,9 +21,9 @@ const SHIP_STARTING_Y: f32 = 150.;
 
 pub async fn draw(lunarmodule: LunarModule) {
     let path = if lunarmodule.trust_active {
-        "src/rocket32.png"
+        "src/images/rocket32.png"
     } else {
-        "src/rocket32_no_trust.png"
+        "src/images/rocket32_no_trust.png"
     };
 
     let corrected_x = lunarmodule.position.x - ROCKET_IMAGE_SIZE / 2.0;
@@ -47,6 +48,7 @@ pub fn create_initial_lunar_module() -> LunarModule {
             x: SHIP_STARTING_X,
             y: SHIP_STARTING_Y,
         },
+        current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         trust: SHIP_STARTING_TRUST,
         trust_active: false,
         fuel: 100.0,

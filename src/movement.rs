@@ -45,7 +45,7 @@ pub fn move_lunar_module(
         }
     }
 
-    let new_position = calculate_position(&lunar_module);
+    let new_position = calculate_positions(lunar_module);
     lunar_module.position.x = new_position.x;
     lunar_module.position.y = new_position.y;
 
@@ -58,12 +58,14 @@ pub fn move_lunar_module(
     // println!("lunar_module: {:?}", lunar_module);
 }
 
-pub fn calculate_position(lunar_module: &lunarmodule::LunarModule) -> Vec2 {
+pub fn calculate_positions(lunar_module: &mut lunarmodule::LunarModule) -> Vec2 {
     let new_relative_y = (PI / 180.0 * lunar_module.rotation).cos() * lunar_module.trust;
     let new_relative_x = (PI / 180.0 * lunar_module.rotation).sin() * lunar_module.trust;
+    let current_relative_position = Vec2::new(new_relative_x, new_relative_y - GRAVITY);
+    lunar_module.current_relative_position = current_relative_position;
 
     Vec2::new(
-        lunar_module.position.x + new_relative_x,
-        lunar_module.position.y - new_relative_y + GRAVITY,
+        lunar_module.position.x + current_relative_position.x,
+        lunar_module.position.y - current_relative_position.y,
     )
 }

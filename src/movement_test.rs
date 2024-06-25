@@ -6,7 +6,7 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_y_up() {
-        let result = movement::calculate_position(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&lunarmodule::LunarModule {
             rotation: 0.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
@@ -22,7 +22,7 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_x_right() {
-        let result = movement::calculate_position(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&lunarmodule::LunarModule {
             rotation: 90.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
@@ -38,7 +38,7 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_x_left() {
-        let result = movement::calculate_position(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&lunarmodule::LunarModule {
             rotation: 270.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_y_down() {
-        let result = movement::calculate_position(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&lunarmodule::LunarModule {
             rotation: 180.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_45degrees() {
-        let result = movement::calculate_position(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&lunarmodule::LunarModule {
             rotation: 45.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,

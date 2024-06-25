@@ -33,10 +33,6 @@ pub fn calculate(
     if nearest_coordinate_left_option.is_none() {
         return GameState::NotLanded;
     }
-    println!(
-        "nearest_coordinate_left_option: {:?}",
-        nearest_coordinate_left_option
-    );
     let nearest_coordinate_left = nearest_coordinate_left_option.unwrap();
     let mut game_state = check_crashed(
         nearest_coordinate_left,
@@ -62,10 +58,10 @@ fn check_landed(
     nearest_coordinate_left: &SurfaceCoordinate,
     y: f32,
     rotation: f32,
-    trust: f32,
+    current_relative_y: f32,
 ) -> GameState {
     if nearest_coordinate_left.is_landing_zone_left && y >= nearest_coordinate_left.y {
-        if trust < 5.0 && (rotation < 8.0 || rotation > 352.0) {
+        if current_relative_y < 1.5 && (rotation < 8.0 || rotation > 352.0) {
             return GameState::Landed;
         }
     }
