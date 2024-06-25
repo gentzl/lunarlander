@@ -43,12 +43,34 @@ mod tests {
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
 
         println!("result: {:?}", &result);
 
         assert_eq!(gamestate::GameState::Landed, result);
+    }
+
+    #[test]
+    fn test_calculate_landed_but_to_fast() {
+        let surface_coordinates = get_surface_coordinates();
+        let lunar_module = lunarmodule::LunarModule {
+            rotation: 3.0,
+            position: Vec2 {
+                x: 101.0,
+                y: 50.0 - IMAGE_CORRECTION_Y,
+            },
+            trust: 1.0,
+            fuel: 100.0,
+            trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 3.0 },
+        };
+        let result = gamestate::calculate(lunar_module, &surface_coordinates);
+
+        println!("result: {:?}", &result);
+
+        assert_eq!(gamestate::GameState::NotLanded, result);
     }
 
     #[test]
@@ -60,6 +82,7 @@ mod tests {
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
 
@@ -77,6 +100,7 @@ mod tests {
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
 

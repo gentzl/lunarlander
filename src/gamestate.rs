@@ -49,7 +49,7 @@ pub fn calculate(
         nearest_coordinate_left,
         lunar_module_y_corrected,
         lunar_module.rotation,
-        lunar_module.trust,
+        lunar_module.current_relative_position.y,
     );
     game_state
 }

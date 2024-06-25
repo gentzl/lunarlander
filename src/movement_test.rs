@@ -6,12 +6,13 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_y_up() {
-        let result = movement::calculate_positions(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&mut lunarmodule::LunarModule {
             rotation: 0.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         });
 
         println!("result: {:?}", result);
@@ -22,12 +23,13 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_x_right() {
-        let result = movement::calculate_positions(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&mut lunarmodule::LunarModule {
             rotation: 90.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         });
 
         println!("result: {:?}", result);
@@ -38,12 +40,13 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_x_left() {
-        let result = movement::calculate_positions(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&mut lunarmodule::LunarModule {
             rotation: 270.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         });
 
         println!("result: {:?}", result);
@@ -54,12 +57,13 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_y_down() {
-        let result = movement::calculate_positions(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&mut lunarmodule::LunarModule {
             rotation: 180.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         });
 
         println!("result: {:?}", result);
@@ -70,12 +74,13 @@ mod tests {
 
     #[test]
     fn test_calculate_position_straight_45degrees() {
-        let result = movement::calculate_positions(&lunarmodule::LunarModule {
+        let result = movement::calculate_positions(&mut lunarmodule::LunarModule {
             rotation: 45.0,
             position: Vec2 { x: 50.0, y: 50.0 },
             trust: 1.0,
             fuel: 100.0,
             trust_active: true,
+            current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         });
 
         println!("result: {:?}", result);
