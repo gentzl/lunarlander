@@ -28,6 +28,11 @@ pub fn calculate(
         .iter()
         .position(|c| c.x == nearest_coordinate_right.x)
         .unwrap();
+
+    if index == 0 {
+        return GameState::NotLanded;
+    }
+
     let nearest_coordinate_left_option = coordinates.get(index - 1);
 
     if nearest_coordinate_left_option.is_none() {

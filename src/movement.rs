@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use crate::lunarmodule;
+use crate::{lunarmodule, useractions};
 use macroquad::prelude::*;
 
 const GRAVITY: f32 = 2.0; // in pixel
@@ -11,10 +11,11 @@ const FUEL_CHANGE_PER_FRAME: f32 = 0.7;
 pub fn move_lunar_module(
     lunar_module: &mut lunarmodule::LunarModule,
     game_audio: &mut crate::gameaudio::GameAudio,
+    user_actions: &useractions::UserAction,
 ) {
     lunar_module.trust_active = false;
 
-    if is_key_down(KeyCode::Up) && lunar_module.fuel > 0.0 {
+    if user_actions.trust_active() && lunar_module.fuel > 0.0 {
         game_audio.exhaust();
         lunar_module.trust += TRUST_CHANGE_PER_FRAME;
         lunar_module.trust_active = true;
@@ -23,8 +24,6 @@ pub fn move_lunar_module(
         if lunar_module.fuel < 0.0 {
             lunar_module.fuel = 0.0;
         }
-    } else if is_key_down(KeyCode::Down) {
-        lunar_module.trust -= TRUST_CHANGE_PER_FRAME / 2.0;
     } else {
         lunar_module.trust -= TRUST_CHANGE_PER_FRAME / 2.0;
     }
@@ -33,12 +32,12 @@ pub fn move_lunar_module(
         lunar_module.trust = 0.0;
     }
 
-    if is_key_down(KeyCode::Right) {
+    if user_actions.rotate_right() {
         lunar_module.rotation += RORATION_CHANGE_PER_FRAME;
         if lunar_module.rotation >= 360.0 {
             lunar_module.rotation = lunar_module.rotation - 360.0;
         }
-    } else if is_key_down(KeyCode::Left) {
+    } else if user_actions.rotate_left() {
         lunar_module.rotation -= RORATION_CHANGE_PER_FRAME;
         if lunar_module.rotation < 0.0 {
             lunar_module.rotation = 360.0 + lunar_module.rotation;

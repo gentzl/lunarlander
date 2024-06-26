@@ -1,5 +1,11 @@
+use std::{default, mem::transmute, thread, time::Duration};
+
 use gamestate::{show_game_over, GameState};
 use macroquad::prelude::*;
+use qlearning::learn;
+use useractions::{UserAction, UserActionSimulation};
+
+mod QLearning;
 mod fuel;
 mod gameaudio;
 mod gamestate;
@@ -8,7 +14,9 @@ mod lunarmodule;
 mod map;
 mod movement;
 mod movement_test;
+mod qlearning;
 mod test;
+mod useractions;
 
 const MAX_WINDOW_WIDTH: f32 = 1200.;
 const MAX_WINDOW_HEIGHT: f32 = 700.;
@@ -16,17 +24,23 @@ const MINIMUM_TIME_FRAME: f32 = 1. / 15.; // 15 frames per second
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let use_q_learning = true;
+    let user_actions = &mut UserAction::new();
+
     let mut game_audio = gameaudio::GameAudio::new();
     let mut coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
     // println!("{:?}", coordinates);
     let mut lunar_module = lunarmodule::create_initial_lunar_module();
     let mut gamestate = GameState::NotLanded;
-
     loop {
+        if use_q_learning {
+            learn(user_actions);
+        }
+
         if gamestate != GameState::NotLanded {
             show_game_over(&gamestate, &mut game_audio);
 
-            if is_key_down(KeyCode::Enter) {
+            if user_actions.restart() {
                 // restart
                 gamestate = GameState::NotLanded;
                 game_audio.reset();
@@ -41,7 +55,7 @@ async fn main() {
         clear_background(BLACK);
         draw_text("LUNAR LANDER", 20.0, 20.0, 30.0, DARKGRAY);
 
-        movement::move_lunar_module(&mut lunar_module, &mut game_audio);
+        movement::move_lunar_module(&mut lunar_module, &mut game_audio, &user_actions);
         map::draw(&coordinates);
         lunarmodule::draw(lunar_module).await;
         fuel::draw(lunar_module.fuel);
