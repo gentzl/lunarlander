@@ -10,7 +10,7 @@ pub enum UserActionSimulation {
 }
 
 pub struct UserAction {
-    action: UserActionSimulation,
+    pub action: UserActionSimulation,
 }
 impl UserAction {
     pub fn new() -> Self {

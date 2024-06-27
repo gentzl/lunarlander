@@ -2,7 +2,7 @@ use crate::{gameaudio, lunarmodule, map::SurfaceCoordinate, MAX_WINDOW_HEIGHT, M
 pub const IMAGE_CORRECTION_Y: f32 = 10.0;
 
 use macroquad::prelude::*;
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum GameState {
     NotLanded,
     Landed,

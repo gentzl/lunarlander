@@ -3,13 +3,14 @@ use std::{default, mem::transmute, thread, time::Duration};
 use gamestate::{show_game_over, GameState};
 use macroquad::prelude::*;
 use qlearning::learn;
-use useractions::{UserAction, UserActionSimulation};
+use useractions::UserAction;
 
 mod QLearning;
 mod fuel;
 mod gameaudio;
 mod gamestate;
 mod gamestate_test;
+mod learning_state;
 mod lunarmodule;
 mod map;
 mod movement;
@@ -26,6 +27,7 @@ const MINIMUM_TIME_FRAME: f32 = 1. / 15.; // 15 frames per second
 async fn main() {
     let use_q_learning = true;
     let user_actions = &mut UserAction::new();
+    let learning_state = &mut learning_state::LearningState::new();
 
     let mut game_audio = gameaudio::GameAudio::new();
     let mut coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
@@ -34,7 +36,13 @@ async fn main() {
     let mut gamestate = GameState::NotLanded;
     loop {
         if use_q_learning {
-            learn(user_actions);
+            learn(
+                learning_state,
+                user_actions,
+                &mut gamestate,
+                lunar_module,
+                &mut coordinates,
+            );
         }
 
         if gamestate != GameState::NotLanded {
