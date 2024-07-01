@@ -20,7 +20,7 @@ pub fn calculate(
         coordinates.iter().find(|c| c.x >= lunar_module.position.x);
 
     if nearest_coordinate_right_option.is_none() {
-        return GameState::NotLanded;
+        return GameState::Crashed;
     }
 
     let nearest_coordinate_right = nearest_coordinate_right_option.unwrap();
@@ -30,13 +30,13 @@ pub fn calculate(
         .unwrap();
 
     if index == 0 {
-        return GameState::NotLanded;
+        return GameState::Crashed;
     }
 
     let nearest_coordinate_left_option = coordinates.get(index - 1);
 
     if nearest_coordinate_left_option.is_none() {
-        return GameState::NotLanded;
+        return GameState::Crashed;
     }
     let nearest_coordinate_left = nearest_coordinate_left_option.unwrap();
     let mut game_state = check_crashed(
@@ -66,7 +66,7 @@ fn check_landed(
     current_relative_y: f32,
 ) -> GameState {
     if nearest_coordinate_left.is_landing_zone_left && y >= nearest_coordinate_left.y {
-        if current_relative_y < 1.5 && (rotation < 8.0 || rotation > 352.0) {
+        if current_relative_y > -1.2 && (rotation < 8.0 || rotation > 352.0) {
             return GameState::Landed;
         }
     }
@@ -86,6 +86,15 @@ fn check_crashed(
     if y - 10.0 > y_surface {
         return GameState::Crashed;
     }
+
+    if x < 0.0 || x > MAX_WINDOW_WIDTH {
+        return GameState::Crashed;
+    }
+
+    if y < 0.0 || y > MAX_WINDOW_HEIGHT {
+        return GameState::Crashed;
+    }
+
     GameState::NotLanded
 }
 

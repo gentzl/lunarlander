@@ -4,6 +4,7 @@ use kira::{
     tween::Tween,
 };
 pub struct GameAudio {
+    pub active: bool,
     manager: AudioManager<DefaultBackend>,
     exhaust: StaticSoundData,
     won: StaticSoundData,
@@ -25,10 +26,14 @@ impl GameAudio {
             lost: lost,
             current_sound: None,
             game_over_playing: false,
+            active: true,
         }
     }
 
     pub fn exhaust(&mut self) {
+        if (!self.active) {
+            return;
+        }
         match &self.current_sound {
             Some(sound) => {
                 if sound.state() != PlaybackState::Playing {
@@ -40,6 +45,9 @@ impl GameAudio {
     }
 
     pub fn won(&mut self) {
+        if (!self.active) {
+            return;
+        }
         if self.game_over_playing {
             return;
         }
@@ -50,6 +58,10 @@ impl GameAudio {
     }
 
     pub fn lost(&mut self) {
+        if (!self.active) {
+            return;
+        }
+
         if self.game_over_playing {
             return;
         }
