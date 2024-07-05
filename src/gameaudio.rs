@@ -31,7 +31,7 @@ impl GameAudio {
     }
 
     pub fn exhaust(&mut self) {
-        if (!self.active) {
+        if !self.active {
             return;
         }
         match &self.current_sound {
@@ -45,7 +45,7 @@ impl GameAudio {
     }
 
     pub fn won(&mut self) {
-        if (!self.active) {
+        if !self.active {
             return;
         }
         if self.game_over_playing {
@@ -58,7 +58,7 @@ impl GameAudio {
     }
 
     pub fn lost(&mut self) {
-        if (!self.active) {
+        if !self.active {
             return;
         }
 

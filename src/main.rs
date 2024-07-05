@@ -1,5 +1,7 @@
 use serde_json::{Result, Value};
-use std::{collections::HashMap, default, fs, mem::transmute, thread, time::Duration};
+use std::{
+    collections::HashMap, default, env, fs, mem::transmute, process, thread, time::Duration,
+};
 
 use gamestate::{show_game_over, GameState};
 use macroquad::prelude::*;
@@ -21,12 +23,31 @@ mod test;
 mod useractions;
 const MAX_WINDOW_WIDTH: f32 = 1200.;
 const MAX_WINDOW_HEIGHT: f32 = 700.;
-const MINIMUM_TIME_FRAME: f32 = 1. / 15.; // 15 frames per second
+const MINIMUM_TIME_FRAME: f32 = 1. / 30.; // 15 frames per second
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let use_q_learning: bool = true;
-    let show_game = false;
+    let mut use_q_learning: bool = true;
+    let mut show_game = false;
+
+    let mut args = env::args().skip(1);
+    while let Some(arg) = args.next() {
+        match &arg[..] {
+            "-l" | "--learn" => use_q_learning = true,
+
+            "-g" | "--showgame" => {
+                show_game = true;
+            }
+            _ => {
+                if arg.starts_with('-') {
+                    println!("Unkown argument {}", arg);
+                } else {
+                    println!("Unkown positional argument {}", arg);
+                }
+            }
+        }
+    }
+
     let user_actions: &mut UserAction = &mut UserAction::new();
     let learning_state = &mut learning_state::LearningState::new();
     load_state(learning_state);
@@ -48,8 +69,9 @@ async fn main() {
         } else if game_state == GameState::Crashed {
             win_loose.1 += 1;
         }
-        if counter % 1000000 == 0 {
+        if counter % 3000000 == 0 {
             write_state(&learning_state, counter, win_loose);
+            process::exit(1);
         }
         if use_q_learning {
             learn(
@@ -62,14 +84,20 @@ async fn main() {
         }
 
         if game_state != GameState::NotLanded {
-            show_game_over(&game_state, &mut game_audio);
-
+            if show_game {
+                show_game_over(&game_state, &mut game_audio);
+            }
             if user_actions.restart() {
                 // restart
                 game_state = GameState::NotLanded;
                 game_audio.reset();
                 coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
                 lunar_module = lunarmodule::create_initial_lunar_module();
+                // create random start x position for the lunar module after restart
+                let start_x = rand::gen_range(50, (MAX_WINDOW_WIDTH - 50.0) as i32) as f32;
+                lunar_module.position.x = start_x;
+                // random rotation
+                lunar_module.rotation = rand::gen_range(0, 360) as f32;
             }
             if show_game {
                 next_frame().await;
@@ -94,7 +122,7 @@ async fn main() {
         }
 
         let frame_time = get_frame_time();
-        if !use_q_learning && frame_time < MINIMUM_TIME_FRAME {
+        if show_game && frame_time < MINIMUM_TIME_FRAME {
             let time_to_sleep = (MINIMUM_TIME_FRAME - frame_time) * 1000.;
             std::thread::sleep(std::time::Duration::from_millis(time_to_sleep as u64));
         }
@@ -130,7 +158,8 @@ fn write_state(
     let dir = path.parent().unwrap();
     std::fs::create_dir_all(dir).unwrap();
     let serialized = serde_json::to_string(&learning_state.q).unwrap();
-
+    // &learning_state.q
+    //println!("size: {}", learning_state.q.len());
     fs::write(file_name_archive, serialized.clone()).expect("Unable to write file");
     fs::write(file_name_latest, serialized).expect("Unable to write file");
     let mut win_rate: f32 = 0.0;

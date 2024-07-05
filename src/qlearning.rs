@@ -20,21 +20,24 @@ pub fn learn(
 ) {
     let landing_zone_left = coordinates.iter().find(|c| c.is_landing_zone_left).unwrap();
 
-    let reward_alive: f32 = 0.002;
-    let reward_nearer: f32 = 0.002;
-    let reward_rotation_in_range = 0.1;
-    let reward_crashed = -5.00;
-    let reward_landed = 100.00;
+    let reward_alive: f32 = 1.0;
+    let reward_nearer: f32 = 1.5;
+    let reward_nearer_x: f32 = 20.0;
+    let reward_nearer_y: f32 = 0.1;
+    let reward_rotation_in_range = 3.0;
+    let reward_crashed = -1000.0;
+    let reward_landed = 10000.00;
     let alpha: f32 = 0.2; // learning rate
     let gamma: f32 = 0.9; // discount factor
+    let epsilon = 0.8; // exploration rate
 
     // left,right, trust, none
-    let mut q_value = (1.0, 1.0, 1.0, 1.0);
+    let mut q_value = (0.5, 0.5, 0.5, 0.5);
 
-    let relative_x = lunar_module.position.x - landing_zone_left.x;
-    let relative_y = lunar_module.position.y - landing_zone_left.y;
+    let relative_x = landing_zone_left.x - lunar_module.position.x;
+    let relative_y = landing_zone_left.y - lunar_module.position.y;
     let current_relative_position = Vec2::new(relative_x, relative_y);
-    let state_key = build_key(lunar_module, current_relative_position);
+    let state_key = build_key(lunar_module, current_relative_position, landing_zone_left);
 
     if !learning_state.q.contains_key(&state_key) {
         learning_state.q.insert(state_key.clone(), q_value);
@@ -54,9 +57,49 @@ pub fn learn(
 
         let mut reward = match game_state {
             GameState::Crashed => reward_crashed,
-            GameState::Landed => reward_landed,
-            _ => 0.0,
+            GameState::Landed => {
+                // print position and relative position
+                /* println!(
+                    "position: {:?}, relative_position: {:?}",
+                    lunar_module.position, current_relative_position
+                ); */
+                reward_landed
+            }
+            _ => reward_alive,
         };
+
+        // if relative x==0 reward
+        if relative_x.abs() < 10.0 {
+            reward += reward_nearer_x * 2.0;
+        }
+        if learning_state.old_relative_position.is_some() {
+            if current_relative_position.y.abs()
+                < learning_state.old_relative_position.unwrap().y.abs()
+            {
+                reward -= reward_nearer_y;
+
+                // reward for the x position
+                // println!("reward_nearer_y: {}", reward_nearer_y);
+            }
+        }
+
+        /*
+        if is_far_away(
+            current_relative_position.x as i32,
+            current_relative_position.y as i32,
+        ) && current_relative_position.y.abs() > 250.0
+        {
+            reward += 1.0 * 3.0;
+        }
+
+        if (current_relative_position.x.abs() < 30.0) {
+            reward += reward_nearer * 10.0;
+        }
+
+        // reward if trust > 2
+        if lunar_module.trust > 2.0 && lunar_module.trust < 10.0 {
+            reward += 1.0;
+        }
 
         //  println!("current_relative_position: {:?}", current_relative_position);
         // reward if relative position is near to the landing zone
@@ -64,34 +107,26 @@ pub fn learn(
             if current_relative_position.x.abs()
                 < learning_state.old_relative_position.unwrap().x.abs()
             {
-                reward += reward_nearer;
+                reward += reward_nearer_x;
+
+                // reward for the x position
+                //   println!("reward_nearer_x: {}", reward_nearer_x);
             }
         }
 
-        // current_relative_position
-        // println!("current_relative_position: {:?}", current_relative_position);
-        /*if !is_far_away(
-            current_relative_position.x as i32,
-            current_relative_position.y as i32,
-        ) && (lunar_module.rotation <= 8.0 || lunar_module.rotation >= 352.0)
+        //println!("current_relative_position: {:?}", current_relative_position);
+
+        } */
+
+        if current_relative_position.x.abs() < 20.0
+            && (lunar_module.rotation <= 8.0 || lunar_module.rotation >= 352.0)
         {
             reward += reward_rotation_in_range;
-        }*/
-        if relative_x == 0.0 {
-            reward += reward_nearer;
-        }
-
-        if !is_far_away(
-            current_relative_position.x as i32,
-            current_relative_position.y as i32,
-        ) && (lunar_module.rotation <= 25.0 || lunar_module.rotation >= 335.0)
-        {
-            reward += reward_rotation_in_range / 4.0;
-        }
-
-        // reward_alive
-        if game_state == &GameState::NotLanded {
-            reward += reward_alive;
+            if (current_relative_position.y.abs() < 60.0) {
+                if relative_y.abs() < 2.0 {
+                    reward += reward_nearer * 2.0;
+                }
+            }
         }
 
         match user_actions.action {
@@ -124,6 +159,16 @@ pub fn learn(
         user_actions.set_action(UserActionSimulation::TrustActive);
     }
 
+    // do random action if epsilon is greater than random value
+    if epsilon > rand::random::<f32>() {
+        let random_action = rand::random::<f32>();
+        if random_action < epsilon {
+            let randomAction: UserActionSimulation = rand::random();
+            //print!("random action: {:?}", randomAction);
+            user_actions.set_action(randomAction);
+        }
+    }
+
     learning_state.old_state_key = state_key.clone();
     learning_state.old_relative_position = Some(current_relative_position);
 
@@ -133,7 +178,11 @@ pub fn learn(
     }
 }
 
-fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> String {
+fn build_key(
+    lunar_module: LunarModule,
+    current_relative_position: Vec2,
+    landing_zone: &SurfaceCoordinate,
+) -> String {
     let mut relative_x_key = round_10(current_relative_position.x);
     let mut relative_y_key = round_10(current_relative_position.y);
     let mut rotation_key = round_rotation(lunar_module.rotation);
@@ -141,20 +190,20 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
 
     let is_far_away = is_far_away(relative_x_key, relative_y_key);
     let mut trust = lunar_module.trust as i32;
-    if trust > 2 {
+    if trust > 6 {
         trust = 100;
-    } else if trust < 0 {
-        trust = -1;
+    } else if trust < -4 {
+        trust = -100;
     }
 
     let fuel = round_fuel(lunar_module.fuel as i32);
 
-    if is_far_away {
+    /* if is_far_away {
         relative_x_key = round_200(current_relative_position.x);
         relative_y_key = round_200(current_relative_position.y);
         rotation_key = 1;
         current_relative_y_key = 1;
-    }
+    } */
     format!(
         "_{},{},_{}_{}_{}_{}",
         relative_x_key, relative_y_key, rotation_key, current_relative_y_key, trust, fuel
@@ -162,15 +211,19 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
 }
 
 fn is_far_away(relative_x_key: i32, relative_y_key: i32) -> bool {
-    relative_x_key.abs() >= 100 || relative_y_key.abs() >= 100
+    relative_x_key.abs() >= 250 || relative_y_key.abs() >= 250
 }
 
 fn round_200(value: f32) -> i32 {
-    ((value / 100.0).round() * 100.0) as i32
+    ((value / 70.0).round() * 70.0) as i32
 }
 
 fn round_10(value: f32) -> i32 {
     ((value / 10.0).round() * 10.0) as i32
+}
+
+fn round_30(value: f32) -> i32 {
+    ((value / 30.0).round() * 30.0) as i32
 }
 
 fn round_rotation(value: f32) -> i32 {
@@ -178,7 +231,7 @@ fn round_rotation(value: f32) -> i32 {
         return ((value / 8.0).round() * 8.0) as i32;
     }
 
-    return ((value / 90.0).round() * 90.0) as i32;
+    return ((value / 45.0).round() * 45.0) as i32;
 }
 
 fn round_fuel(value: i32) -> i32 {

@@ -19,7 +19,7 @@ pub fn generate_coordinates(max_width: f32, max_height: f32) -> Vec<SurfaceCoord
 
     let mut landing_zone_step = random_crate::thread_rng().gen_range(2..STEPS_WIDTH as i32 - 2);
     // only for testing
-    landing_zone_step = 25;
+    landing_zone_step = 15;
 
     let mut coordinates: Vec<SurfaceCoordinate> = Vec::new();
 
@@ -36,7 +36,7 @@ pub fn generate_coordinates(max_width: f32, max_height: f32) -> Vec<SurfaceCoord
         let mut random_y_change: f32 =
             random_crate::thread_rng().gen_range(-MAX_HEIGTH_CHANGE..MAX_HEIGTH_CHANGE);
         // only for testing
-        random_y_change = 10.0;
+        random_y_change = -10.0;
 
         if landing_zone_step == n {
             y = last_y;

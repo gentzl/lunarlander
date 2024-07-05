@@ -1,6 +1,10 @@
 use macroquad::input::{is_key_down, KeyCode};
+use rand::{
+    distributions::{Distribution, Standard},
+    Rng,
+};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum UserActionSimulation {
     RotateLeft,
     RotateRight,
@@ -8,7 +12,17 @@ pub enum UserActionSimulation {
     Restart,
     None,
 }
-
+impl Distribution<UserActionSimulation> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> UserActionSimulation {
+        match rng.gen_range(0..=3) {
+            // rand 0.8
+            0 => UserActionSimulation::RotateLeft,
+            1 => UserActionSimulation::RotateRight,
+            2 => UserActionSimulation::TrustActive,
+            _ => UserActionSimulation::None,
+        }
+    }
+}
 pub struct UserAction {
     pub action: UserActionSimulation,
 }
