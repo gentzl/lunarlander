@@ -30,15 +30,18 @@ const MINIMUM_TIME_FRAME: f32 = 1. / 30.; // 15 frames per second
 async fn main() {
     let mut use_q_learning: bool = true;
     let mut show_game = false;
+    let mut epsilon = 0.0;
 
     let mut args = env::args().skip(1);
     while let Some(arg) = args.next() {
         match &arg[..] {
             "-l" | "--learn" => use_q_learning = true,
+            "-e" | "--explorerate" => epsilon = args.next().unwrap().parse().unwrap(),
 
             "-g" | "--showgame" => {
                 show_game = true;
             }
+
             _ => {
                 if arg.starts_with('-') {
                     println!("Unkown argument {}", arg);
@@ -49,6 +52,10 @@ async fn main() {
         }
     }
 
+    println!(
+        "use_q_learning: {}, epsilon: {}, show_game: {}",
+        use_q_learning, epsilon, show_game
+    );
     let user_actions: &mut UserAction = &mut UserAction::new();
     let learning_state = &mut learning_state::LearningState::new();
     qlearningpersistence::load_state(learning_state);
@@ -61,9 +68,11 @@ async fn main() {
     let mut game_state = GameState::NotLanded;
     learning_state.current_win_loose = (0, 0);
     learning_state.current_reward = 0.0;
+    learning_state.current_new_states_updated = 0;
+    learning_state.current_old_states_load_updated = 0;
 
     loop {
-        if use_q_learning && learning_state.counter % 3000000 == 0 {
+        if use_q_learning && learning_state.counter > 0 && learning_state.counter % 3000000 == 0 {
             qlearningpersistence::write_state(&learning_state);
             process::exit(1);
         }
@@ -74,10 +83,12 @@ async fn main() {
                 &mut game_state,
                 lunar_module,
                 &mut coordinates,
+                epsilon,
             );
         }
 
         if game_state != GameState::NotLanded {
+            learning_state.games_played += 1;
             if show_game {
                 show_game_over(&game_state, &mut game_audio);
             }
@@ -90,7 +101,7 @@ async fn main() {
                 lunar_module.trust = 2.0;
                 // create random start x position for the lunar module after restart
                 let start_x = rand::gen_range(50, (MAX_WINDOW_WIDTH - 50.0) as i32) as f32;
-                //lunar_module.position.x = start_x;
+                lunar_module.position.x = start_x;
                 // random rotation
                 lunar_module.rotation = rand::gen_range(0, 360) as f32;
             }

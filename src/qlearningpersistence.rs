@@ -35,11 +35,14 @@ pub fn write_state(learning_state: &learning_state::LearningState) {
         win_rate = learning_state.win_loose.0 as f32 / count as f32;
     }
     println!(
-        "write_state: {}, win_loose_rate:{} ({},{}), reward: {} ",
+        "write_state: {}, win_loose_rate:{} ({},{}), reward: {}, new_states: {}, old_states: {}, games_playes: {}",
         learning_state.counter,
         win_rate,
         learning_state.win_loose.0,
         learning_state.win_loose.1,
-        learning_state.current_reward
+        learning_state.current_reward,
+        learning_state.current_new_states_updated,
+        learning_state.current_old_states_load_updated,
+        learning_state.games_played
     );
 }
