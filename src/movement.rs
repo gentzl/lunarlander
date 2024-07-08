@@ -3,7 +3,9 @@ use std::f32::consts::PI;
 use crate::{lunarmodule, useractions};
 use macroquad::prelude::*;
 
-const GRAVITY: f32 = 2.0; // in pixel
+//const GRAVITY: f32 = 2.0; // in pixel
+
+const GRAVITY: f32 = 0.3; // in pixel
 const TRUST_CHANGE_PER_FRAME: f32 = 0.25;
 const RORATION_CHANGE_PER_FRAME: f32 = 5.0;
 const FUEL_CHANGE_PER_FRAME: f32 = 0.7;
