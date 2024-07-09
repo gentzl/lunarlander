@@ -7,7 +7,7 @@ const GRAVITY: f32 = 1.5; // in pixel
 
 const TRUST_CHANGE_PER_FRAME: f32 = 0.25;
 const RORATION_CHANGE_PER_FRAME: f32 = 5.0;
-const FUEL_CHANGE_PER_FRAME: f32 = 0.1;
+const FUEL_CHANGE_PER_FRAME: f32 = 0.4;
 
 pub fn move_lunar_module(
     lunar_module: &mut lunarmodule::LunarModule,

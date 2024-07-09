@@ -25,8 +25,6 @@ pub fn write_state(learning_state: &learning_state::LearningState) {
     let dir = path.parent().unwrap();
     std::fs::create_dir_all(dir).unwrap();
     let serialized = serde_json::to_string(&learning_state.q).unwrap();
-    // &learning_state.q
-    //println!("size: {}", learning_state.q.len());
     fs::write(file_name_archive, serialized.clone()).expect("Unable to write file");
     fs::write(file_name_latest, serialized).expect("Unable to write file");
     let mut win_rate: f32 = 0.0;
@@ -35,7 +33,7 @@ pub fn write_state(learning_state: &learning_state::LearningState) {
         win_rate = learning_state.win_loose.0 as f32 / count as f32;
     }
     println!(
-        "write_state: {}, win_loose_rate:{} ({},{}), reward: {}, new_states: {}, old_states: {}, games_playes: {}",
+        "write_state: {}, win_loose_rate:{} ({},{}), reward: {}, new_states: {}, old_states: {}, games_played: {}",
         learning_state.counter,
         win_rate,
         learning_state.win_loose.0,

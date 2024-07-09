@@ -8,7 +8,6 @@ use macroquad::prelude::*;
 use qlearning::learn;
 use useractions::UserAction;
 
-mod QLearning;
 mod fuel;
 mod gameaudio;
 mod gamestate;
