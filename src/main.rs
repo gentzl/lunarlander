@@ -27,8 +27,8 @@ const MINIMUM_TIME_FRAME: f32 = 1. / 30.; // 15 frames per second
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut use_q_learning: bool = true;
-    let mut show_game = false;
+    let mut use_q_learning: bool = false;
+    let mut show_game = true;
     let mut epsilon = 0.0;
 
     let mut args = env::args().skip(1);
@@ -37,8 +37,8 @@ async fn main() {
             "-l" | "--learn" => use_q_learning = true,
             "-e" | "--explorerate" => epsilon = args.next().unwrap().parse().unwrap(),
 
-            "-g" | "--showgame" => {
-                show_game = true;
+            "-h" | "--hidegame" => {
+                show_game = false;
             }
 
             _ => {

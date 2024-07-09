@@ -1,7 +1,6 @@
 use std::{collections::HashMap, f32::consts::FRAC_1_SQRT_2, thread, time::Duration};
 
 use macroquad::{math::Vec2, miniquad::gl::GL_PROGRAM_POINT_SIZE};
-use rand::distributions::OpenClosed01;
 
 use crate::{
     gamestate::GameState,
