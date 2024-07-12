@@ -6,3 +6,4 @@ rls/
 .vscode/
 
 /models/**
+/learnings/*

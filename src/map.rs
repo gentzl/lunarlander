@@ -17,9 +17,9 @@ pub fn generate_coordinates(max_width: f32, max_height: f32) -> Vec<SurfaceCoord
     let steps_width = (max_width / STEPS_WIDTH) as i32;
     let max_mountain_heigth = max_height / 2.5;
 
-    let mut landing_zone_step = random_crate::thread_rng().gen_range(2..STEPS_WIDTH as i32 - 2);
+    let mut landing_zone_step = random_crate::thread_rng().gen_range(8..STEPS_WIDTH as i32 - 8);
     // only for testing
-    landing_zone_step = 15;
+    // landing_zone_step = 15;
 
     let mut coordinates: Vec<SurfaceCoordinate> = Vec::new();
 

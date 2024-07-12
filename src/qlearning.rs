@@ -21,18 +21,21 @@ pub fn learn(
     let landing_zone_left = coordinates.iter().find(|c| c.is_landing_zone_left).unwrap();
 
     let reward_alive: f32 = 1.0;
-    let reward_nearer: f32 = 1.5;
-    let reward_crashed = -1000.0;
-    let reward_landed = 10000.00;
+    let reward_nearer: f32 = 4.5;
+    let reward_crashed = -5000.0;
+    let reward_landed = 7500.00;
     let alpha: f32 = 0.2; // learning rate
     let gamma: f32 = 0.98; // discount factor
 
     learning_state.counter += 1;
+    learning_state.current_counter += 1;
 
     if game_state == &GameState::Landed {
         learning_state.win_loose.0 += 1;
+        learning_state.current_win_loose.0 += 1;
     } else if game_state == &GameState::Crashed {
         learning_state.win_loose.1 += 1;
+        learning_state.current_win_loose.1 += 1;
     }
     // left,right, trust, none
     let mut q_value = (0.5, 0.5, 0.5, 0.5);
@@ -62,34 +65,29 @@ pub fn learn(
 
         let mut reward = match game_state {
             GameState::Crashed => reward_crashed,
-            GameState::Landed => reward_landed,
+            GameState::Landed => reward_landed + 0.5 * (reward_landed / 100.0 * lunar_module.fuel), // reward if fuel is left
             _ => reward_alive,
         };
 
-        /*if current_relative_position.x.abs() == 0.0
-                    && is_far_away(
-                        current_relative_position.x as i32,
-                        current_relative_position.y as i32,
-                    )
-                    && lunar_module.position.y > 350.0
-                {
-                    reward -= 100.0;
-                }
-        */
         if relative_y < 0.0 {
             reward -= 100.0;
         }
 
-        if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() < 100.0 {
+        if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() < 150.0 {
             reward += 25.0;
         }
 
         // reward if relative position is near to the landing zone
         if learning_state.old_relative_position.is_some() {
             if current_relative_position.x.abs()
-                < learning_state.old_relative_position.unwrap().x.abs()
+                < learning_state.old_relative_position.unwrap().0.abs()
             {
-                reward += reward_nearer;
+                reward += reward_nearer * 0.5;
+                let x_change = learning_state.old_relative_position.unwrap().0.abs()
+                    - current_relative_position.x.abs();
+                if x_change > 2.3 {
+                    reward += reward_nearer * 2.0;
+                }
             }
         }
 
@@ -139,7 +137,8 @@ pub fn learn(
     }
 
     learning_state.old_state_key = state_key.clone();
-    learning_state.old_relative_position = Some(current_relative_position);
+    learning_state.old_relative_position =
+        Some((current_relative_position.x, current_relative_position.y));
 
     if game_state != &GameState::NotLanded {
         user_actions.set_action(UserActionSimulation::Restart);
@@ -151,25 +150,22 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
     let mut relative_x_key = round_5(current_relative_position.x);
     let mut relative_y_key = round_5(current_relative_position.y);
     let rotation_key = round_rotation(lunar_module.rotation);
-    let current_relative_y_key = round_relative(lunar_module.current_relative_position.y);
 
     let is_far_away = is_far_away(relative_x_key, relative_y_key);
     let mut trust = lunar_module.trust as i32;
-    if trust > 5 {
+    if trust > 6 {
         trust = 100;
     } else if trust < -4 {
         trust = -100;
     }
-
-    let fuel: i32 = round_fuel(lunar_module.fuel as i32);
 
     if is_far_away {
         relative_x_key = round_35(current_relative_position.x);
         relative_y_key = round_35(current_relative_position.y);
     }
     format!(
-        "_{},{},_{}_{}_{}_{}",
-        relative_x_key, relative_y_key, rotation_key, current_relative_y_key, trust, fuel
+        "_{},{},_{}_{}",
+        relative_x_key, relative_y_key, rotation_key, trust
     )
 }
 

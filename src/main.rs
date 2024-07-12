@@ -56,22 +56,24 @@ async fn main() {
         use_q_learning, epsilon, show_game
     );
     let user_actions: &mut UserAction = &mut UserAction::new();
-    let learning_state = &mut learning_state::LearningState::new();
-    qlearningpersistence::load_state(learning_state);
+    let learning_state = &mut qlearningpersistence::load_state();
 
     let mut game_audio = gameaudio::GameAudio::new();
     game_audio.active = !use_q_learning;
     let mut coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
-    // println!("{:?}", coordinates);
     let mut lunar_module = lunarmodule::create_initial_lunar_module();
     let mut game_state = GameState::NotLanded;
     learning_state.current_win_loose = (0, 0);
     learning_state.current_reward = 0.0;
     learning_state.current_new_states_updated = 0;
     learning_state.current_old_states_load_updated = 0;
+    learning_state.current_counter = 0;
 
     loop {
-        if use_q_learning && learning_state.counter > 0 && learning_state.counter % 3000000 == 0 {
+        if use_q_learning
+            && learning_state.current_counter > 0
+            && learning_state.current_counter % 3000000 == 0
+        {
             qlearningpersistence::write_state(&learning_state);
             process::exit(1);
         }
