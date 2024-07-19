@@ -8,7 +8,7 @@ mod tests {
 
     use super::*;
     #[test]
-    fn test_move_lunar_module_up_increases_trust() {
+    fn test_move_lunar_module_up_increases_thrust() {
         let v1 = Vector3::new(1.0, 1.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
 

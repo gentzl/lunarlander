@@ -40,9 +40,9 @@ mod tests {
                 x: 101.0,
                 y: 50.0 - IMAGE_CORRECTION_Y,
             },
-            trust: 1.0,
+            thrust: 1.0,
             fuel: 100.0,
-            trust_active: true,
+            thrust_active: true,
             current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
@@ -61,9 +61,9 @@ mod tests {
                 x: 101.0,
                 y: 50.0 - IMAGE_CORRECTION_Y,
             },
-            trust: 1.0,
+            thrust: 1.0,
             fuel: 100.0,
-            trust_active: true,
+            thrust_active: true,
             current_relative_position: Vec2 { x: 0.0, y: 3.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
@@ -79,9 +79,9 @@ mod tests {
         let lunar_module = lunarmodule::LunarModule {
             rotation: 3.0,
             position: Vec2 { x: 101.0, y: 10.0 },
-            trust: 1.0,
+            thrust: 1.0,
             fuel: 100.0,
-            trust_active: true,
+            thrust_active: true,
             current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);
@@ -97,9 +97,9 @@ mod tests {
         let lunar_module = lunarmodule::LunarModule {
             rotation: 15.0,
             position: Vec2 { x: 161.0, y: 80.0 },
-            trust: 1.0,
+            thrust: 1.0,
             fuel: 100.0,
-            trust_active: true,
+            thrust_active: true,
             current_relative_position: Vec2 { x: 0.0, y: 0.0 },
         };
         let result = gamestate::calculate(lunar_module, &surface_coordinates);

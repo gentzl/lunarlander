@@ -37,7 +37,7 @@ pub fn learn(
         learning_state.win_loose.1 += 1;
         learning_state.current_win_loose.1 += 1;
     }
-    // left,right, trust, none (default probability)
+    // left,right, thrust, none (default probability)
     let mut q_value = (0.5, 0.5, 0.5, 0.5);
 
     let relative_x = landing_zone_left.x - lunar_module.position.x;
@@ -107,7 +107,7 @@ pub fn learn(
     } else if q_value.1 >= q_value.0 && q_value.1 >= q_value.2 && q_value.1 >= q_value.3 {
         user_actions.set_action(UserActionSimulation::RotateRight);
     } else if q_value.2 >= q_value.0 && q_value.2 >= q_value.1 && q_value.2 >= q_value.3 {
-        user_actions.set_action(UserActionSimulation::TrustActive);
+        user_actions.set_action(UserActionSimulation::ThrustActive);
     }
 
     // do random action if epsilon is greater than random value
@@ -135,11 +135,11 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
     let rotation_key = round_rotation(lunar_module.rotation);
 
     let is_far_away = is_far_away(relative_x_key, relative_y_key);
-    let mut trust = lunar_module.trust as i32;
-    if trust > 6 {
-        trust = 100;
-    } else if trust < -4 {
-        trust = -100;
+    let mut thrust = lunar_module.thrust as i32;
+    if thrust > 6 {
+        thrust = 100;
+    } else if thrust < -4 {
+        thrust = -100;
     }
 
     if is_far_away {
@@ -148,7 +148,7 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
     }
     format!(
         "_{},{},_{}_{}",
-        relative_x_key, relative_y_key, rotation_key, trust
+        relative_x_key, relative_y_key, rotation_key, thrust
     )
 }
 
@@ -167,7 +167,7 @@ fn step(
             old_q_value.1 =
                 (1.0 - ALPHA) * (old_q_value.1) + ALPHA * (reward + GAMMA * q_value_max);
         }
-        UserActionSimulation::TrustActive => {
+        UserActionSimulation::ThrustActive => {
             old_q_value.2 =
                 (1.0 - ALPHA) * (old_q_value.2) + ALPHA * (reward + GAMMA * q_value_max);
         }

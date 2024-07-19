@@ -97,9 +97,9 @@ async fn main() {
                 game_audio.reset();
                 coordinates = map::generate_coordinates(MAX_WINDOW_WIDTH, MAX_WINDOW_HEIGHT);
                 lunar_module = lunarmodule::create_initial_lunar_module();
-                lunar_module.trust = 2.0;
+                lunar_module.thrust = 2.0;
                 // create random start x position for the lunar module after restart
-                let start_x = rand::gen_range(200, (MAX_WINDOW_WIDTH - 200.0) as i32) as f32;
+                let start_x = rand::gen_range(300, (MAX_WINDOW_WIDTH - 300.0) as i32) as f32;
                 lunar_module.position.x = start_x;
                 // random rotation
                 lunar_module.rotation = rand::gen_range(0, 360) as f32;

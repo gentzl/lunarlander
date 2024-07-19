@@ -8,7 +8,7 @@ use rand::{
 pub enum UserActionSimulation {
     RotateLeft,
     RotateRight,
-    TrustActive,
+    ThrustActive,
     Restart,
     None,
 }
@@ -18,7 +18,7 @@ impl Distribution<UserActionSimulation> for Standard {
             // rand 0.8
             0 => UserActionSimulation::RotateLeft,
             1 => UserActionSimulation::RotateRight,
-            2 => UserActionSimulation::TrustActive,
+            2 => UserActionSimulation::ThrustActive,
             _ => UserActionSimulation::None,
         }
     }
@@ -51,8 +51,8 @@ impl UserAction {
         return is_key_down(KeyCode::Right);
     }
 
-    pub fn trust_active(&self) -> bool {
-        if self.action == UserActionSimulation::TrustActive {
+    pub fn thrust_active(&self) -> bool {
+        if self.action == UserActionSimulation::ThrustActive {
             return true;
         }
         return is_key_down(KeyCode::Up);
