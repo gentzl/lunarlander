@@ -100,6 +100,7 @@ This implementation uses Q-learning to optimize the landing strategy of a lunar 
   ```
 
 
-  ##Model
+# Model
+
   The model is stored in the /learnings directory. You can unzip the model.zip and place the file 'learn_latest.json' - Then start the game with the parameter '--learn' to see the results. This model has a win rate of 92%.
 ![alt text](image.png)
