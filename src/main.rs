@@ -68,13 +68,14 @@ async fn main() {
     learning_state.current_new_states_updated = 0;
     learning_state.current_old_states_load_updated = 0;
     learning_state.current_counter = 0;
+    learning_state.current_consumed_fuel = 0;
 
     loop {
         if use_q_learning
             && learning_state.current_counter > 0
-            && learning_state.current_counter % 3000000 == 0
+            && learning_state.current_counter % 1000000 == 0
         {
-            qlearningpersistence::write_state(&learning_state);
+            qlearningpersistence::write_state(&learning_state, epsilon);
             process::exit(1);
         }
         if use_q_learning {
@@ -101,7 +102,7 @@ async fn main() {
                 lunar_module = lunarmodule::create_initial_lunar_module();
                 lunar_module.trust = 2.0;
                 // create random start x position for the lunar module after restart
-                let start_x = rand::gen_range(50, (MAX_WINDOW_WIDTH - 50.0) as i32) as f32;
+                let start_x = rand::gen_range(200, (MAX_WINDOW_WIDTH - 200.0) as i32) as f32;
                 lunar_module.position.x = start_x;
                 // random rotation
                 lunar_module.rotation = rand::gen_range(0, 360) as f32;

@@ -56,6 +56,10 @@ pub fn calculate(
         lunar_module.rotation,
         lunar_module.current_relative_position.y,
     );
+
+    /* if game_state == GameState::Landed {
+        println!("fuel left: {}", lunar_module.fuel);
+    } */
     game_state
 }
 
@@ -66,7 +70,7 @@ fn check_landed(
     current_relative_y: f32,
 ) -> GameState {
     if nearest_coordinate_left.is_landing_zone_left && y >= nearest_coordinate_left.y {
-        if current_relative_y > -1.2 && (rotation < 8.0 || rotation > 352.0) {
+        if current_relative_y > -0.8 && (rotation < 8.0 || rotation > 352.0) {
             return GameState::Landed;
         }
     }

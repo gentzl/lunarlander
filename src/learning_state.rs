@@ -14,6 +14,7 @@ pub struct LearningState {
     pub current_counter: i64,
     pub current_old_states_load_updated: i32,
     pub current_new_states_updated: i32,
+    pub current_consumed_fuel: i32,
     pub games_played: i32,
 }
 
@@ -31,6 +32,7 @@ impl LearningState {
             current_old_states_load_updated: 0,
             current_new_states_updated: 0,
             games_played: 0,
+            current_consumed_fuel: 0,
         }
     }
 }

@@ -20,12 +20,12 @@ pub fn learn(
 ) {
     let landing_zone_left = coordinates.iter().find(|c| c.is_landing_zone_left).unwrap();
 
-    let reward_alive: f32 = 1.0;
+    let reward_alive: f32 = 0.1;
     let reward_nearer: f32 = 4.5;
     let reward_crashed = -5000.0;
-    let reward_landed = 7500.00;
+    let reward_landed = 10000.00;
     let alpha: f32 = 0.2; // learning rate
-    let gamma: f32 = 0.98; // discount factor
+    let gamma: f32 = 0.99; // discount factor
 
     learning_state.counter += 1;
     learning_state.current_counter += 1;
@@ -33,6 +33,7 @@ pub fn learn(
     if game_state == &GameState::Landed {
         learning_state.win_loose.0 += 1;
         learning_state.current_win_loose.0 += 1;
+        learning_state.current_consumed_fuel += round_fuel(lunar_module.fuel as i32);
     } else if game_state == &GameState::Crashed {
         learning_state.win_loose.1 += 1;
         learning_state.current_win_loose.1 += 1;
@@ -69,12 +70,12 @@ pub fn learn(
             _ => reward_alive,
         };
 
-        if relative_y < 0.0 {
-            reward -= 100.0;
-        }
-
+        /*        if relative_y < 0.0 {
+                   reward -= 100.0;
+               }
+        */
         if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() < 150.0 {
-            reward += 25.0;
+            reward += 30.0;
         }
 
         // reward if relative position is near to the landing zone
@@ -82,17 +83,22 @@ pub fn learn(
             if current_relative_position.x.abs()
                 < learning_state.old_relative_position.unwrap().0.abs()
             {
-                reward += reward_nearer * 0.5;
+                reward += reward_nearer * 0.2;
                 let x_change = learning_state.old_relative_position.unwrap().0.abs()
                     - current_relative_position.x.abs();
-                if x_change > 2.3 {
-                    reward += reward_nearer * 2.0;
+                if x_change > 2.7
+                    && is_far_away(
+                        round_relative(current_relative_position.x as f32),
+                        round_relative(current_relative_position.y as f32),
+                    )
+                {
+                    reward += reward_nearer * x_change;
                 }
             }
         }
 
         if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() == 0.0 {
-            reward += 500.0;
+            reward += 1700.0;
         }
 
         match user_actions.action {
@@ -174,7 +180,7 @@ fn is_far_away(relative_x_key: i32, relative_y_key: i32) -> bool {
 }
 
 fn round_35(value: f32) -> i32 {
-    ((value / 35.0).round() * 35.0) as i32
+    ((value / 45.0).round() * 45.0) as i32
 }
 
 fn round_5(value: f32) -> i32 {
