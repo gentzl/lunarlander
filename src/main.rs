@@ -1,7 +1,4 @@
-use serde_json::{Result, Value};
-use std::{
-    collections::HashMap, default, env, fs, mem::transmute, process, thread, time::Duration,
-};
+use std::{env, process};
 
 use gamestate::{show_game_over, GameState};
 use macroquad::prelude::*;
@@ -23,7 +20,7 @@ mod test;
 mod useractions;
 const MAX_WINDOW_WIDTH: f32 = 1200.;
 const MAX_WINDOW_HEIGHT: f32 = 700.;
-const MINIMUM_TIME_FRAME: f32 = 1. / 30.; // 15 frames per second
+const MINIMUM_TIME_FRAME: f32 = 1. / 30.; // 30 frames per second
 
 #[macroquad::main(window_conf)]
 async fn main() {

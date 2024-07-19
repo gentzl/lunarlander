@@ -1,14 +1,20 @@
-use std::{collections::HashMap, f32::consts::FRAC_1_SQRT_2, thread, time::Duration};
-
-use macroquad::{math::Vec2, miniquad::gl::GL_PROGRAM_POINT_SIZE};
+use macroquad::math::Vec2;
 
 use crate::{
     gamestate::GameState,
     learning_state::LearningState,
-    lunarmodule::{self, LunarModule},
+    lunarmodule::LunarModule,
     map::SurfaceCoordinate,
     useractions::{UserAction, UserActionSimulation},
 };
+
+const REWARD_ALIVE: f32 = 0.1;
+const REWARD_NEARER: f32 = 4.5;
+const REWARD_X0_Y0: f32 = 1700.0;
+const REWARD_CRASHED: f32 = -5000.0;
+const REWARD_LANDED: f32 = 10000.00;
+const ALPHA: f32 = 0.2; // learning rate
+const GAMMA: f32 = 0.99; // discount factor
 
 pub fn learn(
     learning_state: &mut LearningState,
@@ -19,13 +25,6 @@ pub fn learn(
     epsilon: f32, // exploration rate
 ) {
     let landing_zone_left = coordinates.iter().find(|c| c.is_landing_zone_left).unwrap();
-
-    let reward_alive: f32 = 0.1;
-    let reward_nearer: f32 = 4.5;
-    let reward_crashed = -5000.0;
-    let reward_landed = 10000.00;
-    let alpha: f32 = 0.2; // learning rate
-    let gamma: f32 = 0.99; // discount factor
 
     learning_state.counter += 1;
     learning_state.current_counter += 1;
@@ -38,7 +37,7 @@ pub fn learn(
         learning_state.win_loose.1 += 1;
         learning_state.current_win_loose.1 += 1;
     }
-    // left,right, trust, none
+    // left,right, trust, none (default probability)
     let mut q_value = (0.5, 0.5, 0.5, 0.5);
 
     let relative_x = landing_zone_left.x - lunar_module.position.x;
@@ -65,15 +64,11 @@ pub fn learn(
             .unwrap();
 
         let mut reward = match game_state {
-            GameState::Crashed => reward_crashed,
-            GameState::Landed => reward_landed + 0.5 * (reward_landed / 100.0 * lunar_module.fuel), // reward if fuel is left
-            _ => reward_alive,
+            GameState::Crashed => REWARD_CRASHED,
+            GameState::Landed => REWARD_LANDED + 0.5 * (REWARD_LANDED / 100.0 * lunar_module.fuel), // reward if fuel is left
+            _ => REWARD_ALIVE,
         };
 
-        /*        if relative_y < 0.0 {
-                   reward -= 100.0;
-               }
-        */
         if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() < 150.0 {
             reward += 30.0;
         }
@@ -83,7 +78,7 @@ pub fn learn(
             if current_relative_position.x.abs()
                 < learning_state.old_relative_position.unwrap().0.abs()
             {
-                reward += reward_nearer * 0.2;
+                reward += REWARD_NEARER * 0.2;
                 let x_change = learning_state.old_relative_position.unwrap().0.abs()
                     - current_relative_position.x.abs();
                 if x_change > 2.7
@@ -92,34 +87,16 @@ pub fn learn(
                         round_relative(current_relative_position.y as f32),
                     )
                 {
-                    reward += reward_nearer * x_change;
+                    reward += REWARD_NEARER * x_change;
                 }
             }
         }
 
         if current_relative_position.x.abs() == 0.0 && current_relative_position.y.abs() == 0.0 {
-            reward += 1700.0;
+            reward += REWARD_X0_Y0;
         }
 
-        match user_actions.action {
-            UserActionSimulation::RotateLeft => {
-                old_q_value.0 =
-                    (1.0 - alpha) * (old_q_value.0) + alpha * (reward + gamma * q_value_max);
-            }
-            UserActionSimulation::RotateRight => {
-                old_q_value.1 =
-                    (1.0 - alpha) * (old_q_value.1) + alpha * (reward + gamma * q_value_max);
-            }
-            UserActionSimulation::TrustActive => {
-                old_q_value.2 =
-                    (1.0 - alpha) * (old_q_value.2) + alpha * (reward + gamma * q_value_max);
-            }
-            // e.g. do nothing
-            _ => {
-                old_q_value.3 =
-                    (1.0 - alpha) * (old_q_value.3) + alpha * (reward + gamma * q_value_max);
-            }
-        }
+        step(&user_actions.action, old_q_value, reward, q_value_max);
 
         learning_state.current_reward += reward;
     }
@@ -173,6 +150,33 @@ fn build_key(lunar_module: LunarModule, current_relative_position: Vec2) -> Stri
         "_{},{},_{}_{}",
         relative_x_key, relative_y_key, rotation_key, trust
     )
+}
+
+fn step(
+    action: &UserActionSimulation,
+    old_q_value: &mut (f32, f32, f32, f32),
+    reward: f32,
+    q_value_max: f32,
+) {
+    match action {
+        UserActionSimulation::RotateLeft => {
+            old_q_value.0 =
+                (1.0 - ALPHA) * (old_q_value.0) + ALPHA * (reward + GAMMA * q_value_max);
+        }
+        UserActionSimulation::RotateRight => {
+            old_q_value.1 =
+                (1.0 - ALPHA) * (old_q_value.1) + ALPHA * (reward + GAMMA * q_value_max);
+        }
+        UserActionSimulation::TrustActive => {
+            old_q_value.2 =
+                (1.0 - ALPHA) * (old_q_value.2) + ALPHA * (reward + GAMMA * q_value_max);
+        }
+        // e.g. do nothing
+        _ => {
+            old_q_value.3 =
+                (1.0 - ALPHA) * (old_q_value.3) + ALPHA * (reward + GAMMA * q_value_max);
+        }
+    }
 }
 
 fn is_far_away(relative_x_key: i32, relative_y_key: i32) -> bool {

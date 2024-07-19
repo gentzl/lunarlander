@@ -1,6 +1,6 @@
 use kira::{
     manager::{backend::DefaultBackend, AudioManager, AudioManagerSettings},
-    sound::{self, static_sound::StaticSoundData, PlaybackState},
+    sound::{static_sound::StaticSoundData, PlaybackState},
     tween::Tween,
 };
 pub struct GameAudio {
